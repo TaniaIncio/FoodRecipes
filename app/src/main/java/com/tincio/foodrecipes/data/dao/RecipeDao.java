@@ -9,14 +9,16 @@ import com.tincio.foodrecipes.data.model.Recipe;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+
 /**
  * Created by juan on 20/05/2017.
  */
 @Dao
 public interface RecipeDao {
-    @Insert
+    @Insert(onConflict = REPLACE)
     void save(Recipe recipe);
 //    @Query("select * from recipe where id = :recipeId")
-    @Query("select * from recipe")
+    @Query("SELECT * FROM Recipe")
     LiveData<List<Recipe>> load();
 }

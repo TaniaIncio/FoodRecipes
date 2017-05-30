@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface RecipeCallback {
 
-    void onResponse(LiveData<List<RecipeResponse>> responseMovies, String... mensajes);
+    void onResponse(LiveData<List<Recipe>> responseMovies, String... mensajes);
 }
+

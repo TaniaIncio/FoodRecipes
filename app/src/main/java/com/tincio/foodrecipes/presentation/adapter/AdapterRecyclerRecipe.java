@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.model.Recipe;
-import com.tincio.foodrecipes.data.service.response.RecipeResponse;
 
 import java.util.List;
 
@@ -21,11 +20,11 @@ import java.util.List;
  */
 public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecyclerRecipe.ViewHolderItem> {
 
-    LiveData<List<RecipeResponse>> listRecipe;
+    LiveData<List<Recipe>> listRecipe;
     Context context;
     ImageView imgRecipe;
     TextView txtRecipe;
-    public AdapterRecyclerRecipe(LiveData<List<RecipeResponse>> arrayString) {
+    public AdapterRecyclerRecipe(LiveData<List<Recipe>> arrayString) {
         this.listRecipe = arrayString;
     }
 
@@ -80,7 +79,7 @@ public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecycler
 
     OnItemClickListener mOnItemClickListener;
     public interface OnItemClickListener{
-        public void setOnItemClickListener(RecipeResponse recipe, Integer indice);
+        public void setOnItemClickListener(Recipe recipe, Integer indice);
     }
 
     public void setOnItemClickListener(OnItemClickListener mItemClickListener){

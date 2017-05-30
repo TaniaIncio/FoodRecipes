@@ -2,7 +2,9 @@ package com.tincio.foodrecipes.presentation.viewModel;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.arch.persistence.room.Database;
 
+import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.service.RecipeRepository;
 import com.tincio.foodrecipes.dominio.callback.RecipeCallback;
@@ -33,9 +35,9 @@ public class RecipeViewModel extends ViewModel{
         this.recipeService = userRepo;
     }*/
 
-    public void getRecipe(RecipeCallback callback)
+    public void getRecipe(RecipeCallback callback, DatabaseHelper helper)
     {
-        recipeService = new RecipeRepository(null,callback);
+        recipeService = new RecipeRepository(helper,callback);
         recipeService.getRecipe(1);
         //return this.listRecipe;
     }

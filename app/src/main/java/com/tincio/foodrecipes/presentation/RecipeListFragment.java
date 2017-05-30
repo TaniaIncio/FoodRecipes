@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tincio.foodrecipes.R;
+import com.tincio.foodrecipes.data.database.DatabaseHelper;
+import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.service.response.RecipeResponse;
 import com.tincio.foodrecipes.dominio.callback.RecipeCallback;
 import com.tincio.foodrecipes.presentation.adapter.AdapterRecyclerRecipe;
@@ -42,11 +44,12 @@ public class RecipeListFragment extends LifecycleFragment implements RecipeCallb
         viewModel.init(UID_KEY);*/
         viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
         viewModel.init(UID_KEY);
-        viewModel.getRecipe(this);
-      //  viewModel.getRecipe().observe(this, recipe -> {
-        //    adapterRecipe = new AdapterRecyclerRecipe(recipe);
-          //  mRecyclerRecipes.setAdapter(adapterRecipe);
-        //});
+        DatabaseHelper helper = new DatabaseHelper(getActivity());
+        viewModel.getRecipe(this, helper);
+        /*viewModel.getRecipe(this.helper).observe(this, recipe -> {
+            adapterRecipe = new AdapterRecyclerRecipe(recipe);
+          mRecyclerRecipes.setAdapter(adapterRecipe);
+        });*/
    //     int recipeId = getArguments().getInt(UID_KEY);
      /*   viewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
         viewModel.init(recipeId);*/
@@ -64,13 +67,13 @@ public class RecipeListFragment extends LifecycleFragment implements RecipeCallb
     }
 
     @Override
-    public void onResponse(LiveData<List<RecipeResponse>> responseMovies, String... mensajes) {
+    public void onResponse(LiveData<List<Recipe>> responseMovies, String... mensajes) {
         if(responseMovies!= null){
             adapterRecipe = new AdapterRecyclerRecipe(responseMovies);
             mRecyclerRecipes.setAdapter(adapterRecipe);
             adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
                 @Override
-                public void setOnItemClickListener(RecipeResponse recipe, Integer indice) {
+                public void setOnItemClickListener(Recipe recipe, Integer indice) {
                     getFragmentManager().beginTransaction().replace(R.id.fragment_base, new StepFragment()).commit();
 
                 }
