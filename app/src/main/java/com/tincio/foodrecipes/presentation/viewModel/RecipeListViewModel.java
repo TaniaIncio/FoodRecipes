@@ -4,27 +4,30 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.tincio.foodrecipes.data.model.Recipe;
+import com.tincio.foodrecipes.data.model.User;
 import com.tincio.foodrecipes.data.service.RecipeRepository;
 
 import java.util.List;
 
 public class RecipeListViewModel extends ViewModel {
-    private int recipeId;
-    private LiveData<List<Recipe>> recipes;
-    private RecipeRepository recipeService;
+    private String recipeId;
+    private LiveData<User> recipes;
+    //private RecipeRepository recipeService;
 
-    public RecipeListViewModel(RecipeRepository recipeService) {
-        this.recipeService = recipeService;
-    }
-
-    public void init(int recipeId) {
-        if(this.recipes != null){
+    public void init(String recipeId) {
+  /*      if(this.recipes != null){
             return;
         }
-        recipes = recipeService.getRecipe(recipeId);
+       // recipes = recipeService.getRecipe(1);*/
         this.recipeId = recipeId;
     }
-    public LiveData<List<Recipe>> getRecipe() {
+
+    public RecipeListViewModel(RecipeRepository recipeService) {
+     //   this.recipeService = recipeService;
+    }
+
+
+    public LiveData<User> getRecipe() {
         return recipes;
     }
 }

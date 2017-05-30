@@ -1,81 +1,74 @@
 package com.tincio.foodrecipes.data.service;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 
 import com.tincio.foodrecipes.data.dao.RecipeDao;
 import com.tincio.foodrecipes.data.model.Recipe;
+import com.tincio.foodrecipes.data.service.response.RecipeResponse;
+import com.tincio.foodrecipes.dominio.callback.RecipeCallback;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by juan on 21/05/2017.
  */
-
 public class RecipeRepository {
 
-    private final WebService webservice;
+   // private  WebService webservice;
     private final RecipeDao recipeDao;
-    private final Executor executor;
+    private RecipeCallback callback;
 
-    @Inject
-    public RecipeRepository(WebService webservice, RecipeDao recipeDao, Executor executor) {
-        this.webservice = webservice;
+    public RecipeRepository(RecipeDao recipeDao, RecipeCallback callback) {
+       // this.webservice = webservice;
         this.recipeDao = recipeDao;
-        this.executor = executor;
+        this.callback = callback;
     }
-
-    public LiveData<List<Recipe>> getRecipe(int recipeId) {
+//LiveData<List<Recipe>>
+    public void getRecipe(int recipeId) {
         refreshRecipe(recipeId);
         // return a LiveData directly from the database.
-        return recipeDao.load();
+        ///return recipeDao.load();
     }
 
     private void refreshRecipe(final int RecipeId) {
-        executor.execute(() -> {
-            // running in a background thread
-            // check if Recipe was fetched recently
-            boolean RecipeExists = false; //recipeDao.hasRecipe(FRESH_TIMEOUT);
-            if (!RecipeExists) {
-                // refresh the data
-                Response response = null;
-                try {
-                    response = webservice.getRecipe(RecipeId).execute();
-                    System.out.println("response "+response.body());
-                    //Recipe mRecipe = Gson
-                    //recipeDao.save(response.body());
-                } catch (IOException e) {
-                    e.printStackTrace();
+        //.client(httpClient.build())
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constants.serviceNames.BASE_RECIPES)
+                .build();
+        try {
+            final MutableLiveData<List<RecipeResponse>> data = new MutableLiveData<>();
+            WebService service = retrofit.create(WebService.class);
+            Call<List<RecipeResponse>> call = service.getRecipe();
+            System.out.println("call url "+call.request().url());
+            call.enqueue(new Callback<List<RecipeResponse>>() {
+                @Override
+                public void onResponse(Call<List<RecipeResponse>> call, Response<List<RecipeResponse>> response) {
+                    data.setValue(response.body());
+                    callback.onResponse(data,"");
                 }
-                // TODO check for error etc.
-                // Update the database.The LiveData will automatically refresh so
-                // we don't need to do anything else here besides updating the database
 
-            }
-        });
+                @Override
+                public void onFailure(Call<List<RecipeResponse>> call, Throwable t) {
+                    callback.onResponse(null,t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    //private WebService webservice;
-    
-   /* public LiveData<Recipe> getRecipe(int RecipeId) {
-        // This is not an optimal implementation, we'll fix it below
-        final MutableLiveData<Recipe> data = new MutableLiveData<>();
-        webservice.getRecipe(RecipeId).enqueue(new Callback<Recipe>() {
-            @Override
-            public void onResponse(Call<Recipe> call, Response<Recipe> response) {
-                // error case is left out for brevity
-                data.setValue(response.body());
-            }
 
-            @Override
-            public void onFailure(Call<Recipe> call, Throwable t) {
-
-            }
-        });
-        return data;
-    }*/
 }
