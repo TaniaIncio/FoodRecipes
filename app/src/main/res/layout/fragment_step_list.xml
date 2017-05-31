@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.tincio.foodrecipes.presentation.StepFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.tincio.foodrecipes.presentation.StepFragment">
+
+    <include layout="@layout/fragment_step"
+        ></include>
+    <android.support.v7.widget.RecyclerView
+    android:id="@+id/recycler_step"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.tincio.foodrecipes.presentation.StepFragment"
+
     tools:listitem="@layout/fragment_step" />
+</LinearLayout>

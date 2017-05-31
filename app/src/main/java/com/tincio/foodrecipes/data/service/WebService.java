@@ -16,10 +16,10 @@ import retrofit2.http.Query;
  */
 
 public interface WebService {
-    @GET("data/Recipe")
+    @GET("topher/2017/May/59121517_baking/baking.json")
     Call<List<RecipeResponse>> getRecipe();
 
-    @GET("data/Step")
-    Call<List<StepResponse>> geSteps(@Query(value = "where", encoded = true) String idRecipe);
+   /* @GET("data/Step")
+    Call<List<StepResponse>> geSteps(@Query(value = "where", encoded = true) String idRecipe);*/
 
 }

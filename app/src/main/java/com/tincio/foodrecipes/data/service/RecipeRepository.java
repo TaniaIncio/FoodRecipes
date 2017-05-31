@@ -2,23 +2,16 @@ package com.tincio.foodrecipes.data.service;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.room.Database;
 
-import com.tincio.foodrecipes.data.dao.RecipeDao;
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.model.Recipe;
+import com.tincio.foodrecipes.data.model.StepRecipe;
 import com.tincio.foodrecipes.data.service.response.RecipeResponse;
-import com.tincio.foodrecipes.dominio.callback.RecipeCallback;
+import com.tincio.foodrecipes.data.service.response.Step;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,31 +23,50 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RecipeRepository {
 
-   // private  WebService webservice;
-    //private final RecipeDao recipeDao;
-    private RecipeCallback callback;
     private DatabaseHelper helper;
-
-    public RecipeRepository(DatabaseHelper helper, RecipeCallback callback) {
+    List<Recipe> listRecipe;
+    List<StepRecipe> listSteps;
+    public RecipeRepository(DatabaseHelper helper) {
        // this.webservice = webservice;
         this.helper = helper;
-        this.callback = callback;
     }
 //LiveData<List<Recipe>>
-    public void getRecipe(int recipeId) {
+    public LiveData<List<Recipe>> getRecipe(int recipeId) {
         refreshRecipe(recipeId);
         // return a LiveData directly from the database.
-        ///return recipeDao.load();
+        return helper.load();
     }
 
     private Recipe convertToRecipe(RecipeResponse mResponse){
         Recipe mRecipe = new Recipe();
         mRecipe.setId(mResponse.getId());
-        mRecipe.setDescription(mResponse.getDescription());
+        mRecipe.setDescription(mResponse.getName());
         mRecipe.setName(mResponse.getName());
         mRecipe.setImage(mResponse.getImage());
+        convertListStep(mResponse.getSteps(), mResponse.getId());
         return mRecipe;
     }
+
+    private void convertListStep(List<Step> list, int idRecipe){
+        List<StepRecipe> lista = new ArrayList<>();
+        for (Step response: list){
+            lista.add(convertToStep(response, idRecipe));
+        }
+        StepRepository repositoryStep = new StepRepository(helper);
+        repositoryStep.saveInDataBase(lista);
+    }
+
+    private StepRecipe convertToStep(Step mResponse, int idRecipe){
+        StepRecipe mRecipe = new StepRecipe();
+        mRecipe.setId(mResponse.getId());
+        mRecipe.setIdRecipe(idRecipe);
+        mRecipe.setName(mResponse.getShortDescription());
+        mRecipe.setInstruction(mResponse.getDescription());
+        mRecipe.setImage(mResponse.getThumbnailURL());
+        mRecipe.setUrlPlayer(mResponse.getVideoURL());
+        return mRecipe;
+    }
+
 
     private void saveInDataBase(List<RecipeResponse> list){
         for (RecipeResponse response: list){
@@ -83,19 +95,16 @@ public class RecipeRepository {
             call.enqueue(new Callback<List<RecipeResponse>>() {
                 @Override
                 public void onResponse(Call<List<RecipeResponse>> call, Response<List<RecipeResponse>> response) {
+                    System.out.println("lista recipe "+ response);
                     data.setValue(convertListRecipe(response.body()));
-                    callback.onResponse(data,"");
                     /***save in data base*/
                     saveInDataBase(response.body());
                 }
 
                 @Override
                 public void onFailure(Call<List<RecipeResponse>> call, Throwable t) {
-                    if(helper.load()!=null){
-                        callback.onResponse(helper.load(),"");
-                    }else{
-                        callback.onResponse(null,t.getMessage());
-                    }
+                    System.out.println("error " +
+                            "lista recipe "+t.getMessage());
 
                 }
             });

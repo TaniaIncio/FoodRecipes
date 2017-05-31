@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tincio.foodrecipes.R;
+import com.tincio.foodrecipes.data.model.StepRecipe;
 import com.tincio.foodrecipes.data.service.response.StepResponse;
 import com.tincio.foodrecipes.presentation.StepFragment.OnListFragmentInteractionListener;
 
@@ -21,10 +22,10 @@ import java.util.List;
  */
 public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecyclerViewAdapter.ViewHolder> {
 
-    private final LiveData<List<StepResponse>> mValues;
+    private final List<StepRecipe> mValues;
     //private final OnListFragmentInteractionListener mListener;
 
-    public MyStepRecyclerViewAdapter(LiveData<List<StepResponse>> items) {//, OnListFragmentInteractionListener listener
+    public MyStepRecyclerViewAdapter(List<StepRecipe> items) {//, OnListFragmentInteractionListener listener
         mValues = items;
       //  mListener = listener;
     }
@@ -38,9 +39,9 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.getValue().get(position);
+        holder.mItem = mValues.get(position);
       //  holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.getValue().get(position).getName());
+        holder.mContentView.setText(mValues.get(position).getName());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,13 +57,13 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
 
     @Override
     public int getItemCount() {
-        return mValues.getValue().size();
+        return mValues.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mContentView;
-        public StepResponse mItem;
+        public StepRecipe mItem;
 
         public ViewHolder(View view) {
             super(view);

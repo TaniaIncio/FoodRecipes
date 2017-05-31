@@ -1,12 +1,10 @@
 package com.tincio.foodrecipes.presentation;
 
 import android.arch.lifecycle.LifecycleFragment;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,11 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tincio.foodrecipes.R;
+import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.service.response.StepResponse;
-import com.tincio.foodrecipes.dominio.callback.StepCallback;
 import com.tincio.foodrecipes.presentation.viewModel.StepViewModel;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -27,10 +23,11 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class StepFragment extends LifecycleFragment implements StepCallback{
+public class StepFragment extends LifecycleFragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String RECIPE_ID = "idRecipe";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     //private OnListFragmentInteractionListener mListener;
@@ -42,10 +39,11 @@ public class StepFragment extends LifecycleFragment implements StepCallback{
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static StepFragment newInstance(int columnCount) {
+    public static StepFragment newInstance(int columnCount, int idRecipe) {
         StepFragment fragment = new StepFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(RECIPE_ID, idRecipe);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,7 +53,22 @@ public class StepFragment extends LifecycleFragment implements StepCallback{
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(StepViewModel.class);
         viewModel.init(UID_KEY);
-        viewModel.getSteps(this,"id_recipe=1");
+        DatabaseHelper helper = new DatabaseHelper(getActivity());
+        viewModel.getSteps(helper,getArguments().getInt(RECIPE_ID)).observe(this, steps -> {
+            if (mColumnCount <= 1) {
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            } else {
+                recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
+            }
+            recyclerView.setAdapter(new MyStepRecyclerViewAdapter(steps));
+            /*adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
+                @Override
+                public void setOnItemClickListener(Recipe recipe, Integer indice) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new StepFragment()).commit();
+
+                }
+            });*/
+        });
     }
 
     @Override
@@ -71,12 +84,9 @@ public class StepFragment extends LifecycleFragment implements StepCallback{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_step_list, container, false);
-
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            recyclerView = (RecyclerView) view;
-
-        }
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_step);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        recyclerView.setHasFixedSize(true);
         return view;
     }
 
@@ -96,16 +106,6 @@ public class StepFragment extends LifecycleFragment implements StepCallback{
     public void onDetach() {
         super.onDetach();
        // mListener = null;
-    }
-
-    @Override
-    public void onResponse(LiveData<List<StepResponse>> responseSteps, String... mensajes) {
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
-        }
-        recyclerView.setAdapter(new MyStepRecyclerViewAdapter(responseSteps));
     }
 
  /*   @Override

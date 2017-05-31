@@ -20,11 +20,11 @@ import java.util.List;
  */
 public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecyclerRecipe.ViewHolderItem> {
 
-    LiveData<List<Recipe>> listRecipe;
+    List<Recipe> listRecipe;
     Context context;
     ImageView imgRecipe;
     TextView txtRecipe;
-    public AdapterRecyclerRecipe(LiveData<List<Recipe>> arrayString) {
+    public AdapterRecyclerRecipe(List<Recipe> arrayString) {
         this.listRecipe = arrayString;
     }
 
@@ -38,15 +38,16 @@ public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecycler
 
     @Override
     public void onBindViewHolder(final ViewHolderItem holder, int position) {
-        holder.txtItemRecycler.setText(listRecipe.getValue().get(position).getName());
-        Picasso.with(context).load(listRecipe.getValue().get(position).getImage()).into(holder.imgRecipe);
+        holder.txtItemRecycler.setText(listRecipe.get(position).getName());
+        if(listRecipe.get(position).getImage().isEmpty())return;
+        Picasso.with(context).load(listRecipe.get(position).getImage()).into(holder.imgRecipe);
         // Retrieves an image specified by the URL, displays it in the UI.
 
     }
 
     @Override
     public int getItemCount() {
-        return listRecipe.getValue()==null?0:listRecipe.getValue().size();
+        return listRecipe==null?0:listRecipe.size();
     }
 
 
@@ -66,7 +67,7 @@ public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecycler
                 public void onClick(View v) {
                     if(mOnItemClickListener != null){
                         if(getAdapterPosition()>=0){
-                            mOnItemClickListener.setOnItemClickListener(listRecipe.getValue().get(getAdapterPosition()),getAdapterPosition());
+                            mOnItemClickListener.setOnItemClickListener(listRecipe.get(getAdapterPosition()),getAdapterPosition());
                         }
 
                     }

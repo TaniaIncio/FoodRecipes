@@ -2,7 +2,6 @@ package com.tincio.foodrecipes.presentation;
 
 
 import android.arch.lifecycle.LifecycleFragment;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,18 +14,14 @@ import android.view.ViewGroup;
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.model.Recipe;
-import com.tincio.foodrecipes.data.service.response.RecipeResponse;
-import com.tincio.foodrecipes.dominio.callback.RecipeCallback;
 import com.tincio.foodrecipes.presentation.adapter.AdapterRecyclerRecipe;
 import com.tincio.foodrecipes.presentation.viewModel.RecipeViewModel;
-
-import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecipeListFragment extends LifecycleFragment implements RecipeCallback{
+public class RecipeListFragment extends LifecycleFragment {
 
     public static String TAG = RecipeListFragment.class.getSimpleName();
 
@@ -45,14 +40,18 @@ public class RecipeListFragment extends LifecycleFragment implements RecipeCallb
         viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
         viewModel.init(UID_KEY);
         DatabaseHelper helper = new DatabaseHelper(getActivity());
-        viewModel.getRecipe(this, helper);
-        /*viewModel.getRecipe(this.helper).observe(this, recipe -> {
+       // viewModel.getRecipe(this, helper);
+        viewModel.getRecipe(helper).observe(this, recipe -> {
             adapterRecipe = new AdapterRecyclerRecipe(recipe);
-          mRecyclerRecipes.setAdapter(adapterRecipe);
-        });*/
-   //     int recipeId = getArguments().getInt(UID_KEY);
-     /*   viewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
-        viewModel.init(recipeId);*/
+            mRecyclerRecipes.setAdapter(adapterRecipe);
+            adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
+                @Override
+                public void setOnItemClickListener(Recipe recipe, Integer indice) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, StepFragment.newInstance(1,recipe.getId())).commit();
+
+                }
+            });
+        });
     }
 
     @Override
@@ -64,21 +63,5 @@ public class RecipeListFragment extends LifecycleFragment implements RecipeCallb
         mRecyclerRecipes.setLayoutManager(mManagerRecycler);
         mRecyclerRecipes.setHasFixedSize(true);
         return view;
-    }
-
-    @Override
-    public void onResponse(LiveData<List<Recipe>> responseMovies, String... mensajes) {
-        if(responseMovies!= null){
-            adapterRecipe = new AdapterRecyclerRecipe(responseMovies);
-            mRecyclerRecipes.setAdapter(adapterRecipe);
-            adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
-                @Override
-                public void setOnItemClickListener(Recipe recipe, Integer indice) {
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new StepFragment()).commit();
-
-                }
-            });
-        }
-
     }
 }

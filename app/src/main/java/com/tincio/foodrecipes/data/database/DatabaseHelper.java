@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.tincio.foodrecipes.data.model.Recipe;
+import com.tincio.foodrecipes.data.model.StepRecipe;
 
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class DatabaseHelper {
 
     public void insertRecipeAsync(Recipe mRecipe){
         new InsertRecipe().execute(mRecipe);
+
+
     }
 
     private class InsertRecipe extends AsyncTask<Recipe,Void,Void>{
@@ -48,5 +51,27 @@ public class DatabaseHelper {
 
     public LiveData<List<Recipe>> load(){
         return mDb.recipeDao().load();
+    }
+
+    /**Steps**/
+    public LiveData<List<StepRecipe>> loadSteps(int idRecipe){
+        return mDb.recipeDao().loadSteps(idRecipe);
+    }
+    public void insertStepsAsync(StepRecipe mStep){
+        new InsertStepsAsync().execute(mStep);
+    }
+
+    private class InsertStepsAsync extends AsyncTask<StepRecipe,Void,Void>{
+
+        @Override
+        protected Void doInBackground(StepRecipe... params) {
+            mDb.recipeDao().saveStep(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 }

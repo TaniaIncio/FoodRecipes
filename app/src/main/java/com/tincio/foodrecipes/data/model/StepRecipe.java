@@ -15,7 +15,8 @@ public class StepRecipe {
     private String instruction;
     private String name;
     private int order;
-
+    private String image;
+    private int idRecipe;
     public int getId() {
         return id;
     }
@@ -54,5 +55,21 @@ public class StepRecipe {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public int getIdRecipe() {
+        return idRecipe;
+    }
+
+    public void setIdRecipe(int idRecipe) {
+        this.idRecipe = idRecipe;
     }
 }

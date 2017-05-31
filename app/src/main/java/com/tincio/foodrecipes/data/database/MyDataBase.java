@@ -1,22 +1,20 @@
 package com.tincio.foodrecipes.data.database;
 
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
 import android.arch.persistence.room.Database;
-import android.arch.persistence.room.DatabaseConfiguration;
-import android.arch.persistence.room.InvalidationTracker;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.tincio.foodrecipes.data.dao.RecipeDao;
 import com.tincio.foodrecipes.data.model.Recipe;
+import com.tincio.foodrecipes.data.model.StepRecipe;
 
 import static com.tincio.foodrecipes.data.database.MyDataBase.DATABASE_VERSION;
 
 /**
  * Created by juan on 30/05/2017.
  */
-@Database(entities = {Recipe.class},
+@Database(entities = {Recipe.class, StepRecipe.class},
         version = DATABASE_VERSION)
 public abstract class MyDataBase extends RoomDatabase {
     private static final String DATABASE_NAME = "RecipeDB";
