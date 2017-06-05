@@ -1,15 +1,14 @@
 package com.tincio.foodrecipes.data.model;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Created by juan on 30/05/2017.
  */
 
-@Entity
+@Entity(primaryKeys = {"id", "idRecipe"})
 public class StepRecipe {
-    @PrimaryKey
+
     private int id;
     private String urlPlayer;
     private String instruction;
@@ -72,4 +71,5 @@ public class StepRecipe {
     public void setIdRecipe(int idRecipe) {
         this.idRecipe = idRecipe;
     }
+
 }

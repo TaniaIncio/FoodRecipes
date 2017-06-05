@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.model.StepRecipe;
+import com.tincio.foodrecipes.data.service.response.Step;
 import com.tincio.foodrecipes.data.service.response.StepResponse;
 import com.tincio.foodrecipes.presentation.StepFragment.OnListFragmentInteractionListener;
 
@@ -42,17 +43,6 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
         holder.mItem = mValues.get(position);
       //  holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).getName());
-
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-       //         if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-     //               mListener.onListFragmentInteraction(holder.mItem);
-         //       }
-            }
-        });
     }
 
     @Override
@@ -69,6 +59,14 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
             super(view);
             mView = view;
             mContentView = (TextView) view.findViewById(R.id.content);
+            mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mOnItemClickListener !=null){
+                        mOnItemClickListener.setOnItemClickListener(mValues.get(getAdapterPosition()), getAdapterPosition());
+                    }
+                }
+            });
         }
 
         @Override
@@ -76,4 +74,15 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
+
+
+    OnItemClickListener mOnItemClickListener;
+    public interface OnItemClickListener{
+        public void setOnItemClickListener(StepRecipe step, Integer indice);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener mItemClickListener){
+        this.mOnItemClickListener = mItemClickListener;
+    }
+
 }

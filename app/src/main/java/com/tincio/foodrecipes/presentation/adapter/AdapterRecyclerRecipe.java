@@ -67,7 +67,7 @@ public class AdapterRecyclerRecipe extends  RecyclerView.Adapter<AdapterRecycler
                 public void onClick(View v) {
                     if(mOnItemClickListener != null){
                         if(getAdapterPosition()>=0){
-                            mOnItemClickListener.setOnItemClickListener(listRecipe.get(getAdapterPosition()),getAdapterPosition());
+                                mOnItemClickListener.setOnItemClickListener(listRecipe.get(getAdapterPosition()),getAdapterPosition());
                         }
 
                     }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_base"
+        android:name="com.tincio.foodrecipes.presentation.StepFragment"
+        android:tag="ListMoviesFragment"
+        tools:layout="@layout/fragment_step"
+        android:layout_weight="1">
+    </fragment>
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_base2"
+        android:name="com.tincio.foodrecipes.presentation.IngredientFragment"
+        android:tag="DetalleMovieFragment"
+        tools:layout="@layout/fragment_ingredient"
+        android:layout_weight="1">
+    </fragment>
+</LinearLayout>

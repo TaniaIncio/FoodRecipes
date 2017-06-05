@@ -11,9 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
+import com.tincio.foodrecipes.data.model.StepRecipe;
 import com.tincio.foodrecipes.data.service.response.StepResponse;
 import com.tincio.foodrecipes.presentation.viewModel.StepViewModel;
 
@@ -34,6 +36,10 @@ public class StepFragment extends LifecycleFragment {
     private StepViewModel viewModel;
     private static final String UID_KEY = "stepId";
     RecyclerView recyclerView;
+    LinearLayout linearIngredient;
+    public static String TAG = RecipeListFragment.class.getSimpleName();
+    int idRecipe ;
+    MyStepRecyclerViewAdapter adapter;
     public StepFragment() {
     }
 
@@ -53,21 +59,22 @@ public class StepFragment extends LifecycleFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(StepViewModel.class);
         viewModel.init(UID_KEY);
+        this.idRecipe = getArguments().getInt(RECIPE_ID, 0) == 0? this.idRecipe :getArguments().getInt(RECIPE_ID);
         DatabaseHelper helper = new DatabaseHelper(getActivity());
-        viewModel.getSteps(helper,getArguments().getInt(RECIPE_ID)).observe(this, steps -> {
+        viewModel.getSteps(helper,this.idRecipe).observe(this, steps -> {
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
             }
-            recyclerView.setAdapter(new MyStepRecyclerViewAdapter(steps));
-            /*adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
+            adapter = new MyStepRecyclerViewAdapter(steps);
+            recyclerView.setAdapter(adapter);
+            adapter.setOnItemClickListener(new MyStepRecyclerViewAdapter.OnItemClickListener() {
                 @Override
-                public void setOnItemClickListener(Recipe recipe, Integer indice) {
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new StepFragment()).commit();
-
+                public void setOnItemClickListener(StepRecipe step, Integer indice) {
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new InstructionFragment()).addToBackStack(TAG).commit();
                 }
-            });*/
+            });
         });
     }
 
@@ -87,6 +94,15 @@ public class StepFragment extends LifecycleFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_step);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
+
+        linearIngredient = (LinearLayout)view.findViewById(R.id.option_ingredient);
+        linearIngredient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("id enviada "+idRecipe);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_base, IngredientFragment.newInstance(1,idRecipe)).addToBackStack(TAG).commit();
+            }
+        });
         return view;
     }
 

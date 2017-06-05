@@ -22,7 +22,7 @@ public class StepRepository {
         return helper.loadSteps(recipeId);
     }
 
-    public  void saveInDataBase(List<StepRecipe> lista){
+    public void saveInDataBase(List<StepRecipe> lista){
         for (StepRecipe step: lista){
             helper.insertStepsAsync(step);
         }

@@ -2,9 +2,11 @@ package com.tincio.foodrecipes.data.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import com.tincio.foodrecipes.data.model.Ingredient;
 import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.model.StepRecipe;
 
@@ -27,4 +29,11 @@ public interface RecipeDao {
     LiveData<List<StepRecipe>> loadSteps(int recipeId);
     @Insert(onConflict = REPLACE)
     void saveStep(StepRecipe stepRecipe);
+
+    @Insert(onConflict = REPLACE)
+    void saveIngredient(Ingredient recipe);
+    @Query("SELECT * FROM Ingredient where idRecipe = :recipeId")
+    LiveData<List<Ingredient>> loadIngredients(int recipeId);
+    @Query("DELETE FROM Ingredient")
+    void deleteIngredient();
 }

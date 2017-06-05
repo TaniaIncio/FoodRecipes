@@ -6,6 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.tincio.foodrecipes.data.dao.RecipeDao;
+import com.tincio.foodrecipes.data.model.Ingredient;
 import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.model.StepRecipe;
 
@@ -14,7 +15,7 @@ import static com.tincio.foodrecipes.data.database.MyDataBase.DATABASE_VERSION;
 /**
  * Created by juan on 30/05/2017.
  */
-@Database(entities = {Recipe.class, StepRecipe.class},
+@Database(entities = {Recipe.class, StepRecipe.class, Ingredient.class},
         version = DATABASE_VERSION)
 public abstract class MyDataBase extends RoomDatabase {
     private static final String DATABASE_NAME = "RecipeDB";

@@ -19,7 +19,4 @@ public interface WebService {
     @GET("topher/2017/May/59121517_baking/baking.json")
     Call<List<RecipeResponse>> getRecipe();
 
-   /* @GET("data/Step")
-    Call<List<StepResponse>> geSteps(@Query(value = "where", encoded = true) String idRecipe);*/
-
 }

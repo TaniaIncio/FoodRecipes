@@ -1,122 +1,46 @@
 package com.tincio.foodrecipes.data.service.response;
 
+/**
+ * Created by juan on 31/05/2017.
+ */
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by juan on 28/05/2017.
- */
-
 public class IngredientResponse {
 
-    @SerializedName("created")
+    @SerializedName("quantity")
     @Expose
-    private Integer created;
-    @SerializedName("count")
+    private double quantity;
+    @SerializedName("measure")
     @Expose
-    private String count;
-    @SerializedName("name")
+    private String measure;
+    @SerializedName("ingredient")
     @Expose
-    private String name;
-    @SerializedName("___class")
-    @Expose
-    private String _class;
-    @SerializedName("id")
-    @Expose
-    private Integer id;
-    @SerializedName("ownerId")
-    @Expose
-    private Object ownerId;
-    @SerializedName("updated")
-    @Expose
-    private Object updated;
-    @SerializedName("objectId")
-    @Expose
-    private String objectId;
-    @SerializedName("id_recipe")
-    @Expose
-    private Integer idRecipe;
-    @SerializedName("__meta")
-    @Expose
-    private String meta;
+    private String ingredient;
 
-    public Integer getCreated() {
-        return created;
+    public double getQuantity() {
+        return quantity;
     }
 
-    public void setCreated(Integer created) {
-        this.created = created;
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
-    public String getCount() {
-        return count;
+    public String getMeasure() {
+        return measure;
     }
 
-    public void setCount(String count) {
-        this.count = count;
+    public void setMeasure(String measure) {
+        this.measure = measure;
     }
 
-    public String getName() {
-        return name;
+    public String getIngredient() {
+        return ingredient;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
     }
 
-    public String getClass_() {
-        return _class;
-    }
-
-    public void setClass_(String _class) {
-        this._class = _class;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Object getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Object ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public Object getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Object updated) {
-        this.updated = updated;
-    }
-
-    public String getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
-    }
-
-    public Integer getIdRecipe() {
-        return idRecipe;
-    }
-
-    public void setIdRecipe(Integer idRecipe) {
-        this.idRecipe = idRecipe;
-    }
-
-    public String getMeta() {
-        return meta;
-    }
-
-    public void setMeta(String meta) {
-        this.meta = meta;
-    }
 }

@@ -4,8 +4,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
+import com.tincio.foodrecipes.data.model.Ingredient;
 import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.model.StepRecipe;
+import com.tincio.foodrecipes.data.service.response.IngredientResponse;
 import com.tincio.foodrecipes.data.service.response.RecipeResponse;
 import com.tincio.foodrecipes.data.service.response.Step;
 
@@ -24,16 +26,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RecipeRepository {
 
     private DatabaseHelper helper;
-    List<Recipe> listRecipe;
-    List<StepRecipe> listSteps;
     public RecipeRepository(DatabaseHelper helper) {
-       // this.webservice = webservice;
         this.helper = helper;
     }
-//LiveData<List<Recipe>>
+
     public LiveData<List<Recipe>> getRecipe(int recipeId) {
         refreshRecipe(recipeId);
-        // return a LiveData directly from the database.
         return helper.load();
     }
 
@@ -44,6 +42,7 @@ public class RecipeRepository {
         mRecipe.setName(mResponse.getName());
         mRecipe.setImage(mResponse.getImage());
         convertListStep(mResponse.getSteps(), mResponse.getId());
+        convertListIngredient(mResponse.getIngredients(), mResponse.getId());
         return mRecipe;
     }
 
@@ -54,6 +53,26 @@ public class RecipeRepository {
         }
         StepRepository repositoryStep = new StepRepository(helper);
         repositoryStep.saveInDataBase(lista);
+    }
+
+    private void convertListIngredient(List<IngredientResponse> list, int idRecipe){
+        IngredientRepository repository = new IngredientRepository(helper);
+
+        List<Ingredient> lista = new ArrayList<>();
+        for (IngredientResponse response: list){
+            lista.add(convertToIngredient(response, idRecipe));
+        }
+
+        repository.saveInDataBase(lista);
+    }
+
+    private Ingredient convertToIngredient(IngredientResponse mResponse, int idRecipe){
+        Ingredient mIngredient = new Ingredient();
+        mIngredient.setIdRecipe(idRecipe);
+        mIngredient.setIngredient(mResponse.getIngredient());
+        mIngredient.setMeasure(mResponse.getMeasure());
+
+        return mIngredient;
     }
 
     private StepRecipe convertToStep(Step mResponse, int idRecipe){
@@ -69,6 +88,8 @@ public class RecipeRepository {
 
 
     private void saveInDataBase(List<RecipeResponse> list){
+        IngredientRepository repository = new IngredientRepository(helper);
+        repository.deleteIngredient();
         for (RecipeResponse response: list){
             helper.insertRecipeAsync(convertToRecipe(response));
         }

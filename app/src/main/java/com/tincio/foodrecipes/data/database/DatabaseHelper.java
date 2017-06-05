@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.tincio.foodrecipes.data.model.Ingredient;
 import com.tincio.foodrecipes.data.model.Recipe;
 import com.tincio.foodrecipes.data.model.StepRecipe;
 
@@ -27,6 +28,10 @@ public class DatabaseHelper {
     public DatabaseHelper(Context mContext) {
         this.mContext = mContext;
         mDb=MyDataBase.getDatabase(mContext);
+    }
+
+    public MyDataBase getDataBase(){
+        return mDb;
     }
 
     public void insertRecipeAsync(Recipe mRecipe){
@@ -55,6 +60,7 @@ public class DatabaseHelper {
 
     /**Steps**/
     public LiveData<List<StepRecipe>> loadSteps(int idRecipe){
+        System.out.println("idrecipe"+idRecipe);
         return mDb.recipeDao().loadSteps(idRecipe);
     }
     public void insertStepsAsync(StepRecipe mStep){
@@ -62,10 +68,48 @@ public class DatabaseHelper {
     }
 
     private class InsertStepsAsync extends AsyncTask<StepRecipe,Void,Void>{
-
         @Override
         protected Void doInBackground(StepRecipe... params) {
             mDb.recipeDao().saveStep(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    /**Ingredient**/
+    public LiveData<List<Ingredient>> loadIngredient(int idRecipe){
+        System.out.println("idrecipe"+idRecipe);
+        return mDb.recipeDao().loadIngredients(idRecipe);
+    }
+    public void insertIngredientAsync(Ingredient mStep){
+        new InsertIngredientAsync().execute(mStep);
+    }
+
+    private class InsertIngredientAsync extends AsyncTask<Ingredient,Void,Void>{
+        @Override
+        protected Void doInBackground(Ingredient... params) {
+            mDb.recipeDao().saveIngredient(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    public void deleteIngredient(){
+        new DeleteIngredientAsync().execute();
+    }
+
+    private class DeleteIngredientAsync extends AsyncTask<Void,Void,Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            mDb.recipeDao().deleteIngredient();
             return null;
         }
 

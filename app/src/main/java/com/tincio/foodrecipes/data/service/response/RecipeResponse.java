@@ -19,7 +19,7 @@ public class RecipeResponse {
     private String name;
     @SerializedName("ingredients")
     @Expose
-    private List<Ingredient> ingredients = null;
+    private List<IngredientResponse> ingredients = null;
     @SerializedName("steps")
     @Expose
     private List<Step> steps = null;
@@ -46,11 +46,11 @@ public class RecipeResponse {
         this.name = name;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<IngredientResponse> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(List<IngredientResponse> ingredients) {
         this.ingredients = ingredients;
     }
 

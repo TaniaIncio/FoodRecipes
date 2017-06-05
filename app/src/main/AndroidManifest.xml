@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tincio.foodrecipes">
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,6 +17,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".presentation.widget.RecipeAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recipe_app_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".presentation.widget.RecipeWIdgetService"
+            android:exported="false"></service>
+
+        <!--provider-->
+        <!--<service android:name=".presentation.widget.RecipeWIdgetService" />-->
+
+        <service
+            android:name=".presentation.widget.GridWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <provider
+            android:name=".data.provider.RecipeContentProvider"
+            android:authorities="com.tincio.foodrecipes"
+            android:exported="true" />
     </application>
 
 </manifest>
