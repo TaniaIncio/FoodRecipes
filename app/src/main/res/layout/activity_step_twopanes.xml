@@ -17,9 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/fragment_base2"
-        android:name="com.tincio.foodrecipes.presentation.IngredientFragment"
-        android:tag="DetalleMovieFragment"
-        tools:layout="@layout/fragment_ingredient"
+        android:name="com.tincio.foodrecipes.presentation.InstructionFragment"
+        android:tag="InstructionFragment"
+        tools:layout="@layout/fragment_instruction"
         android:layout_weight="1">
     </fragment>
 </LinearLayout>

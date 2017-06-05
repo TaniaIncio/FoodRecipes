@@ -30,6 +30,7 @@ public class RecipeListFragment extends LifecycleFragment {
     private RecipeViewModel viewModel;
     AdapterRecyclerRecipe adapterRecipe;
     RecyclerView.LayoutManager mManagerRecycler;
+    private int COUNT_ROW = 3;
 
     /**OUTLEt**/
     RecyclerView mRecyclerRecipes;
@@ -48,7 +49,16 @@ public class RecipeListFragment extends LifecycleFragment {
             adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
                 @Override
                 public void setOnItemClickListener(Recipe recipe, Integer indice) {
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, StepFragment.newInstance(1,recipe.getId())).addToBackStack(TAG).commit();
+
+                    if(getResources().getBoolean(R.bool.isTablet)){
+                        StepFragment fragment = (StepFragment)getFragmentManager().findFragmentByTag(StepFragment.TAG);
+                        /*if(movie == null){
+                            Toast.makeText(getContext(),"No existe detalle para esta pelicula", Toast.LENGTH_LONG).show();
+                        }else {
+                            fragment.setDetailMovie(movie);
+                        }*/
+                    }else
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_base, StepFragment.newInstance(1,recipe.getId())).addToBackStack(TAG).commit();
 
                 }
             });
@@ -61,7 +71,7 @@ public class RecipeListFragment extends LifecycleFragment {
         View view = inflater.inflate(R.layout.fragment_list_recipe, container, false);
         mRecyclerRecipes = (RecyclerView)view.findViewById(R.id.recycler_recipe);
         if(getResources().getBoolean(R.bool.isTablet)){
-            mManagerRecycler = new GridLayoutManager(getContext(),3);
+            mManagerRecycler = new GridLayoutManager(getContext(),COUNT_ROW);
         }else{
             mManagerRecycler = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL,false);
         }

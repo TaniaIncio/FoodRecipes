@@ -51,6 +51,7 @@ public class StepFragment extends LifecycleFragment {
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putInt(RECIPE_ID, idRecipe);
         fragment.setArguments(args);
+
         return fragment;
     }
 
