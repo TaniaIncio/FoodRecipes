@@ -3,6 +3,7 @@ package com.tincio.foodrecipes.presentation;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -37,9 +38,10 @@ public class StepFragment extends LifecycleFragment {
     private static final String UID_KEY = "stepId";
     RecyclerView recyclerView;
     LinearLayout linearIngredient;
-    public static String TAG = RecipeListFragment.class.getSimpleName();
+    public static String TAG = StepFragment.class.getSimpleName();
     int idRecipe ;
     MyStepRecyclerViewAdapter adapter;
+    private SharedPreferences preferences;
     public StepFragment() {
     }
 
@@ -54,13 +56,18 @@ public class StepFragment extends LifecycleFragment {
 
         return fragment;
     }
+    private int getIdRecipe(){
+        return preferences.getInt(getString(R.string.preferences_recipeid), 0);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(StepViewModel.class);
         viewModel.init(UID_KEY);
-        this.idRecipe = getArguments().getInt(RECIPE_ID, 0) == 0? this.idRecipe :getArguments().getInt(RECIPE_ID);
+        preferences = getActivity().getSharedPreferences(getString(R.string.preferences), Context.MODE_PRIVATE);
+     //   if(getArguments()!=null)
+            this.idRecipe = getIdRecipe();// getArguments().getInt(RECIPE_ID, 0) == 0? this.idRecipe :getArguments().getInt(RECIPE_ID);
         DatabaseHelper helper = new DatabaseHelper(getActivity());
         viewModel.getSteps(helper,this.idRecipe).observe(this, steps -> {
             if (mColumnCount <= 1) {
@@ -73,7 +80,10 @@ public class StepFragment extends LifecycleFragment {
             adapter.setOnItemClickListener(new MyStepRecyclerViewAdapter.OnItemClickListener() {
                 @Override
                 public void setOnItemClickListener(StepRecipe step, Integer indice) {
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new InstructionFragment()).addToBackStack(TAG).commit();
+                    if(getResources().getBoolean(R.bool.isTablet))
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, new InstructionFragment()).commit();
+                    else
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_base, new InstructionFragment()).addToBackStack(TAG).commit();
                 }
             });
         });
@@ -101,7 +111,10 @@ public class StepFragment extends LifecycleFragment {
             @Override
             public void onClick(View v) {
                 System.out.println("id enviada "+idRecipe);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_base, IngredientFragment.newInstance(1,idRecipe)).addToBackStack(TAG).commit();
+                if(getResources().getBoolean(R.bool.isTablet))
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, IngredientFragment.newInstance(1,idRecipe)).commit();
+                else
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, IngredientFragment.newInstance(1,idRecipe)).addToBackStack(TAG).commit();
             }
         });
         return view;

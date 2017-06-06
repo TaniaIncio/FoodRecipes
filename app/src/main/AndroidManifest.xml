@@ -30,10 +30,10 @@
 
         <service
             android:name=".presentation.widget.RecipeWIdgetService"
-            android:exported="false"></service>
+            android:exported="false" />
 
-        <!--provider-->
-        <!--<service android:name=".presentation.widget.RecipeWIdgetService" />-->
+        <!-- provider -->
+        <!-- <service android:name=".presentation.widget.RecipeWIdgetService" /> -->
 
         <service
             android:name=".presentation.widget.GridWidgetService"
@@ -43,6 +43,8 @@
             android:name=".data.provider.RecipeContentProvider"
             android:authorities="com.tincio.foodrecipes"
             android:exported="true" />
+
+        <activity android:name=".presentation.StepActivity"></activity>
     </application>
 
 </manifest>

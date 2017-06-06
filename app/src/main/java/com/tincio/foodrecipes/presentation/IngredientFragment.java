@@ -3,6 +3,7 @@ package com.tincio.foodrecipes.presentation;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,6 +28,7 @@ public class IngredientFragment extends LifecycleFragment {
     RecyclerView recyclerView;
     public static String TAG = RecipeListFragment.class.getSimpleName();
     MyIngredientRecyclerViewAdapter adapter;
+    private SharedPreferences preferences;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -48,13 +50,18 @@ public class IngredientFragment extends LifecycleFragment {
         super.onCreate(savedInstanceState);
 
     }
+
+    private int getIdRecipe(){
+        return preferences.getInt(getString(R.string.preferences_recipeid), 0);
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(IngredientViewModel.class);
         viewModel.init(UID_KEY);
+        preferences = getActivity().getSharedPreferences(getString(R.string.preferences), Context.MODE_PRIVATE);
         DatabaseHelper helper = new DatabaseHelper(getActivity());
-        viewModel.getIngredient(helper,getArguments().getInt(RECIPE_ID)).observe(this, ingredients -> {
+        viewModel.getIngredient(helper,getIdRecipe()).observe(this, ingredients -> {
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             } else {

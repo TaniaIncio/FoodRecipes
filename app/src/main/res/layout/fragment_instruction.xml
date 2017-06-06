@@ -10,9 +10,10 @@
     <!-- TODO: Update blank fragment layout -->
 
     <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-        android:layout_marginTop="176px"
+        android:layout_marginTop="20dp"
         android:id="@+id/player_view"
         android:focusable="true"
         android:layout_width="match_parent"
-        android:layout_height="634px"/>
+        android:layout_height="200dp"/>
+
 </FrameLayout>

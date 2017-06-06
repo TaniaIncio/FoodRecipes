@@ -4,22 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
+    <!--android:id="@+id/fragment_base"-->
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_base"
         android:name="com.tincio.foodrecipes.presentation.StepFragment"
-        android:tag="ListMoviesFragment"
-        tools:layout="@layout/fragment_step"
+        android:tag="StepFragment"
+        tools:layout="@layout/fragment_step_list"
         android:layout_weight="1">
     </fragment>
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_base2"
-        android:name="com.tincio.foodrecipes.presentation.InstructionFragment"
+        android:id="@+id/fragment_base_tablet"
+        android:name="com.tincio.foodrecipes.presentation.IngredientFragment"
         android:tag="InstructionFragment"
-        tools:layout="@layout/fragment_instruction"
+        tools:layout="@layout/fragment_ingredient_list"
         android:layout_weight="1">
     </fragment>
 </LinearLayout>
