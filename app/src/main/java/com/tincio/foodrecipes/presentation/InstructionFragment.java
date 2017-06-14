@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class InstructionFragment extends LifecycleFragment implements View.OnClickListener{//}, SurfaceHolder.Callback{
 
-    //protected VideoView videoView;
 
     public static String TAG = InstructionFragment.class.getSimpleName();
     /***VIEWS**/
@@ -72,7 +71,7 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
         this.idSelected = getArguments().getInt(ID);
         this.urlSelected = getArguments().getString(URL);
         this.checkButtons();
-        this.reproduceVideo(this.urlSelected);
+        this.reproduceVideo();
     }
 
     void checkButtons(){
@@ -101,6 +100,36 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
             this.linearButtons.setVisibility(View.VISIBLE);
             this.checkOrientation();
         }
+        this.initMediaPlayer();
+    }
+
+    private void initMediaPlayer(){
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                if (urlSelected != null && urlSelected.isEmpty() == false) {
+                    mediaPlayer = new MediaPlayer();
+                    try {
+
+                        mediaPlayer.setDisplay(surfaceHolder);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                Log.d(TAG, "First surface destroyed!");
+            }
+        });
     }
 
     private void checkOrientation(){
@@ -131,20 +160,32 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_next:
+                this.checkStateVideo();
                 setDataView(this.listStep.get(this.idSelected+1));
                 break;
             case R.id.btn_previous:
+                this.checkStateVideo();
                 setDataView(this.listStep.get(this.idSelected-1));
                 break;
         }
     }
 
+    private void checkStateVideo(){
+        if(mediaPlayer!=null){
+            if(mediaPlayer.isPlaying())
+                mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
     protected void setDataView(StepRecipe step){
         this.txtDescription.setText(step.getInstruction());
         this.idSelected = step.getId();
-        this.reproduceVideo(step.getUrlPlayer());
-        this.checkButtons();
+        this.urlSelected = step.getUrlPlayer();
         this.checkVideo(step.getUrlPlayer());
+        this.reproduceVideo();
+        this.checkButtons();
+
     }
 
     private void checkVideo(String url){
@@ -154,59 +195,27 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
             this.surfaceView.setVisibility(View.VISIBLE);
     }
 
-    private void reproduceVideo(String urlVideo){
-        //mediaPlayer.setDisplay(holder);
-        try {
-            if(mediaPlayer!=null){
-                if(mediaPlayer.isPlaying())
-                    mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-            this.urlSelected = urlVideo;
-            surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-                @Override
-                public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                    if (urlSelected != null) {
-                        mediaPlayer = new MediaPlayer();
-                        try {
-                            mediaPlayer.setDataSource(urlSelected);
-                            mediaPlayer.setDisplay(surfaceHolder);
-                            mediaPlayer.prepareAsync();
-                            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                @Override
-                                public void onPrepared(MediaPlayer mp) {
-                                    System.out.println("video ready");
-                                    mediaPlayer.start();
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
+    private void reproduceVideo() {
+        if (urlSelected != null && urlSelected.isEmpty() == false) {
+            mediaPlayer = new MediaPlayer();
+            try {
+                mediaPlayer.setDataSource(urlSelected);
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        System.out.println("video ready");
+                        mediaPlayer.start();
                     }
-                }
+                });
 
-                @Override
-                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+            } catch (IOException e) {
+                e.printStackTrace();
 
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                @Override
-                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                    Log.d(TAG, "First surface destroyed!");
-                }
-            });
-
-
-        }  catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
