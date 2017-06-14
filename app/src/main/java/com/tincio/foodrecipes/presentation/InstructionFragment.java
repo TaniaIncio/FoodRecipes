@@ -157,9 +157,9 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
     private void reproduceVideo(String urlVideo){
         //mediaPlayer.setDisplay(holder);
         try {
-            System.out.println("url a setear "+urlVideo);
             if(mediaPlayer!=null){
-                mediaPlayer.stop();
+                if(mediaPlayer.isPlaying())
+                    mediaPlayer.stop();
                 mediaPlayer.release();
                 mediaPlayer = null;
             }
@@ -172,8 +172,15 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                         try {
                             mediaPlayer.setDataSource(urlSelected);
                             mediaPlayer.setDisplay(surfaceHolder);
-                            mediaPlayer.prepare();
-                            mediaPlayer.start();
+                            mediaPlayer.prepareAsync();
+                            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mp) {
+                                    System.out.println("video ready");
+                                    mediaPlayer.start();
+                                }
+                            });
+
                         } catch (IOException e) {
                             e.printStackTrace();
 
@@ -194,6 +201,8 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                     Log.d(TAG, "First surface destroyed!");
                 }
             });
+
+
         }  catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (Exception e) {
