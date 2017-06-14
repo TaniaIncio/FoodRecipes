@@ -124,24 +124,7 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
         btnNext = (Button)view.findViewById(R.id.btn_next);
         this.surfaceView = (SurfaceView)view.findViewById(R.id.player_view);
         this.linearButtons = (LinearLayout)view.findViewById(R.id.linear_buttons);
-      //  mediaPlayer = new MediaPlayer();
-        //mediaPlayer =  MediaPlayer.create(getActivity(), Uri.parse("https://d17h27t6h515a5.cloudfront.net/topher/2017/April/58ffd974_-intro-creampie/-intro-creampie.mp4"));
-        // Obteniendo el objeto SurfaceHolder a partir del SurfaceView
-        //SurfaceHolder holder = this.surfaceView.getHolder();
-        //holder.addCallback(this);
-
-
         return view;
-    }
-
-
-    private void setupVideoView(View view) {
-        // Make sure to use the correct VideoView import
-        /*videoView = (VideoView)view.findViewById(R.id.video_view);
-        videoView.setOnPreparedListener(getActivity());
-
-        //For now we just picked an arbitrary item to play
-        videoView.setVideoURI(View viewUri.parse("https://archive.org/download/Popeye_forPresident/Popeye_forPresident_512kb.mp4"));*/
     }
 
     @Override
@@ -171,30 +154,6 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
             this.surfaceView.setVisibility(View.VISIBLE);
     }
 
-/*    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            System.out.println("surface created");
-            System.out.println("url video "+this.urlSelected);
-           // mediaPlayer =  MediaPlayer.create(getActivity(), Uri.parse("https://d17h27t6h515a5.cloudfront.net/topher/2017/April/58ffd974_-intro-creampie/-intro-creampie.mp4"));
-            mediaPlayer.setDisplay(holder);
-            mediaPlayer.setDataSource(this.urlSelected);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            System.out.println("error "+e.getCause());
-            //Log.e("MEDIA_PLAYER", e.getMessage());
-        } catch (IllegalStateException e) {
-            //Log.e("MEDIA_PLAYER", e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            //Log.e("MEDIA_PLAYER", e.getMessage());
-            e.printStackTrace();
-            e.getCause();
-        }
-    }*/
-
     private void reproduceVideo(String urlVideo){
         //mediaPlayer.setDisplay(holder);
         try {
@@ -205,22 +164,11 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                 mediaPlayer = null;
             }
             this.urlSelected = urlVideo;
-            /*mediaPlayer.reset();
-            SurfaceHolder holder = this.surfaceView.getHolder();
-            holder.addCallback(this);
-            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-            mediaPlayer.setDataSource(urlVideo);
-            mediaPlayer.prepare();
-            mediaPlayer.start();*/
             surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
                 @Override
                 public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                    Log.d(TAG, "First surface created!");
-                   // mFirstSurface = surfaceHolder;
                     if (urlSelected != null) {
-                        mediaPlayer = new MediaPlayer();//.create(getActivity(),
-                               //Uri.parse(urlSelected), surfaceHolder);
-                       // mActiveSurface = mFirstSurface;
+                        mediaPlayer = new MediaPlayer();
                         try {
                             mediaPlayer.setDataSource(urlSelected);
                             mediaPlayer.setDisplay(surfaceHolder);
@@ -248,20 +196,8 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
             });
         }  catch (IllegalStateException e) {
             e.printStackTrace();
-//            Log.e("MEDIA_PLAYER", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
-/*    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mediaPlayer.release();
-    }*/
 }

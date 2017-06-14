@@ -21,9 +21,8 @@ import java.util.List;
 public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecyclerViewAdapter.ViewHolder> {
 
     private final List<StepRecipe> mValues;
-    //private final OnListFragmentInteractionListener mListener;
 
-    public MyStepRecyclerViewAdapter(List<StepRecipe> items) {//, OnListFragmentInteractionListener listener
+    public MyStepRecyclerViewAdapter(List<StepRecipe> items) {
         mValues = items;
       //  mListener = listener;
     }

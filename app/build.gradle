@@ -51,5 +51,4 @@ dependencies {
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    //compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

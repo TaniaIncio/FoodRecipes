@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.model.Recipe;
-import com.tincio.foodrecipes.data.service.response.Step;
 import com.tincio.foodrecipes.presentation.adapter.AdapterRecyclerRecipe;
 import com.tincio.foodrecipes.presentation.viewModel.RecipeViewModel;
 
@@ -57,8 +56,6 @@ public class RecipeListFragment extends LifecycleFragment {
                         editor.putInt(getString(R.string.preferences_recipeid), recipe.getId());
                         editor.apply();
                     getActivity().startActivity(new Intent(getActivity(), StepActivity.class));
-                    //getFragmentManager().beginTransaction().replace(R.id.fragment_base, StepFragment.newInstance(1,recipe.getId())).addToBackStack(TAG).commit();
-
                 }
             });
         });

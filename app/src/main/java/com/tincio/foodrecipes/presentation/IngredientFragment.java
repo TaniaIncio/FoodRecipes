@@ -70,13 +70,6 @@ public class IngredientFragment extends LifecycleFragment {
             adapter = new MyIngredientRecyclerViewAdapter(ingredients);
             recyclerView.setAdapter(adapter);
 
-            /*adapterRecipe.setOnItemClickListener(new AdapterRecyclerRecipe.OnItemClickListener() {
-                @Override
-                public void setOnItemClickListener(Recipe recipe, Integer indice) {
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, new StepFragment()).commit();
-
-                }
-            });*/
         });
     }
 

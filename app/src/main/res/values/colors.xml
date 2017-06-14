@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/orange_movies</color>
-<color name="colorPrimaryDark">@color/orange_movies_dark</color>
-<color name="colorAccent">@color/orange_movies_dark</color>
+    <color name="colorPrimary">@color/orange_app</color>
+<color name="colorPrimaryDark">@color/orange_app_dark</color>
+<color name="colorAccent">@color/orange_app_dark</color>
 <color name="selector_color_ripple">@color/colorPrimary</color>
 
 <color name="grey_800_trans75">#BF424242</color>
 <color name="grey_400_trans">#BFBDBDBD</color>
-<color name="orange_movies">#FF9800</color>
-<color name="orange_movies_dark">#F57C00</color>
+<color name="orange_app">#FF9800</color>
+<color name="orange_app_dark">#F57C00</color>
 
 
 </resources>
