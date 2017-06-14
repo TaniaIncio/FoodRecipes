@@ -68,7 +68,7 @@ public class StepFragment extends LifecycleFragment {
                 public void setOnItemClickListener(StepRecipe step, Integer indice) {
 
                     if(getResources().getBoolean(R.bool.isTablet))
-                        getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, new InstructionFragment()).commit();
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, InstructionFragment.newInstance(step.getInstruction(), step.getUrlPlayer(), step.getId(), adapter.getValues())).commit();
                     else
                         getFragmentManager().beginTransaction().replace(R.id.fragment_base_step, InstructionFragment.newInstance(step.getInstruction(), step.getUrlPlayer(), step.getId(), adapter.getValues())).addToBackStack(InstructionFragment.TAG).commit();
                 }
