@@ -44,7 +44,9 @@
             android:authorities="com.tincio.foodrecipes"
             android:exported="true" />
 
-        <activity android:name=".presentation.StepActivity"></activity>
+        <activity android:name=".presentation.StepActivity">
+
+        </activity>
     </application>
 
 </manifest>

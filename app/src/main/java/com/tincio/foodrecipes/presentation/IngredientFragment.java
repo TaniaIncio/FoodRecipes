@@ -24,9 +24,9 @@ public class IngredientFragment extends LifecycleFragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String RECIPE_ID = "idRecipe";
     private IngredientViewModel viewModel;
-    private static final String UID_KEY = "stepId";
+    private static final String UID_KEY = "ingredientId";
     RecyclerView recyclerView;
-    public static String TAG = RecipeListFragment.class.getSimpleName();
+    public static String TAG = IngredientFragment.class.getSimpleName();
     MyIngredientRecyclerViewAdapter adapter;
     private SharedPreferences preferences;
     /**

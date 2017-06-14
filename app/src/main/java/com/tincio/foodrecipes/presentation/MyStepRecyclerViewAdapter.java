@@ -1,6 +1,5 @@
 package com.tincio.foodrecipes.presentation;
 
-import android.arch.lifecycle.LiveData;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +8,7 @@ import android.widget.TextView;
 
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.model.StepRecipe;
-import com.tincio.foodrecipes.data.service.response.Step;
 import com.tincio.foodrecipes.data.service.response.StepResponse;
-import com.tincio.foodrecipes.presentation.StepFragment.OnListFragmentInteractionListener;
 
 import java.util.List;
 
@@ -85,4 +82,7 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
         this.mOnItemClickListener = mItemClickListener;
     }
 
+    public List<StepRecipe> getValues(){
+        return this.mValues;
+    }
 }

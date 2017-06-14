@@ -1,170 +1,143 @@
 package com.tincio.foodrecipes.presentation;
 
 
+import android.app.Fragment;
 import android.arch.lifecycle.LifecycleFragment;
-import android.net.Uri;
+import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.LoopingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveVideoTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.tincio.foodrecipes.R;
+import com.tincio.foodrecipes.data.model.StepRecipe;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InstructionFragment extends LifecycleFragment implements View.OnClickListener{
+public class InstructionFragment extends LifecycleFragment implements View.OnClickListener{//}, SurfaceHolder.Callback{
 
     //protected VideoView videoView;
 
-    protected int selectedIndex;
-    protected boolean pausedInOnStop = false;
-//    private SimpleExoPlayerView simpleExoPlayerView;
-    private SimpleExoPlayerView simpleExoPlayerView;
-    private SimpleExoPlayer player;
-    private ExoPlayer.EventListener exoPlayerEventListener;
     public static String TAG = InstructionFragment.class.getSimpleName();
+    /***VIEWS**/
+    private TextView txtDescription;
+    private Button btnPrevious;
+    private Button btnNext;
+    SurfaceView surfaceView;
+    LinearLayout linearButtons;
+    /***CONSTANTS**/
+    protected static String ID = "ID";
+    protected static String URL = "URL";
+    protected static String DESCRIPTION = "DESCRIPTION";
+    protected static String LIST_STEP = "LIST_STEP";
+    //player
+    /**VARIABLES***/
+    List<StepRecipe> listStep;
+    int idSelected;
+    private MediaPlayer mediaPlayer;
+    String urlSelected;
 
     public InstructionFragment() {
         // Required empty public constructor
     }
 
+    public static InstructionFragment newInstance(String description, String url, int id, List<StepRecipe> listStep){
+        InstructionFragment fragment = new InstructionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(DESCRIPTION, description);
+        bundle.putString(URL, url);
+        bundle.putInt(ID, id);
+        bundle.putParcelableArrayList(LIST_STEP,(ArrayList)listStep);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
+    void setData(){
+        this.txtDescription.setText(getArguments().getString(DESCRIPTION));
+        this.listStep = getArguments().getParcelableArrayList(LIST_STEP);
+        this.idSelected = getArguments().getInt(ID);
+        this.urlSelected = getArguments().getString(URL);
+        this.checkButtons();
+        this.reproduceVideo(this.urlSelected);
+    }
+
+    void checkButtons(){
+        this.btnPrevious.setVisibility(View.VISIBLE);
+        this.btnNext.setVisibility(View.VISIBLE);
+        if(this.idSelected> 0){
+            if(this.idSelected == this.listStep.size() - 1)
+                this.btnNext.setVisibility(View.INVISIBLE);
+        }else
+            this.btnPrevious.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        this.btnNext.setOnClickListener(this);
+        this.btnPrevious.setOnClickListener(this);
+        this.initControls();
+        setData();
+    }
+
+    private void initControls(){
+        if(getResources().getBoolean(R.bool.isTablet)) {
+            this.linearButtons.setVisibility(View.GONE);
+        }else {
+            this.linearButtons.setVisibility(View.VISIBLE);
+            this.checkOrientation();
+        }
+    }
+
+    private void checkOrientation(){
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, (int)getResources().getDimension(R.dimen.height_surface_video));
+            this.surfaceView.setLayoutParams(lp);
+        } else {
+            // Landscape Mode
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+            this.surfaceView.setLayoutParams(lp);
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragment_instruction, container, false);
-        // 1. Create a default TrackSelector
-        Handler mainHandler = new Handler();
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(mainHandler, videoTrackSelectionFactory);
+        txtDescription = (TextView)view.findViewById(R.id.txt_description_instruction);
+        btnPrevious = (Button)view.findViewById(R.id.btn_previous);
+        btnNext = (Button)view.findViewById(R.id.btn_next);
+        this.surfaceView = (SurfaceView)view.findViewById(R.id.player_view);
+        this.linearButtons = (LinearLayout)view.findViewById(R.id.linear_buttons);
+      //  mediaPlayer = new MediaPlayer();
+        //mediaPlayer =  MediaPlayer.create(getActivity(), Uri.parse("https://d17h27t6h515a5.cloudfront.net/topher/2017/April/58ffd974_-intro-creampie/-intro-creampie.mp4"));
+        // Obteniendo el objeto SurfaceHolder a partir del SurfaceView
+        //SurfaceHolder holder = this.surfaceView.getHolder();
+        //holder.addCallback(this);
 
-// 2. Create a default LoadControl
-        LoadControl loadControl = new DefaultLoadControl();
-
-// 3. Create the player
-        player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
-        simpleExoPlayerView = new SimpleExoPlayerView(getActivity());
-        simpleExoPlayerView = (SimpleExoPlayerView)view.findViewById(R.id.player_view);
-
-//Set media controller
-        simpleExoPlayerView.setUseController(true);
-        simpleExoPlayerView.requestFocus();
-
-// Bind the player to the view.
-        simpleExoPlayerView.setPlayer(player);
-
-
-
-
-
-//CHOOSE CONTENT: Livestream links may be out of date so find any m3u8 files online and replace:
-//VIDEO FROM SD CARD:
-//        String urimp4 = "/FileName.mp4";
-//        Uri mp4VideoUri = Uri.parse(Environment.getExternalStorageDirectory().getAbsolutePath()+urimp4);
-
-//yachts livestream m3m8 file:
-        Uri mp4VideoUri =Uri.parse("https://d17h27t6h515a5.cloudfront.net/topher/2017/April/58ffdb88_6-add-the-batter-to-the-pan-w-the-crumbs-cheesecake/6-add-the-batter-to-the-pan-w-the-crumbs-cheesecake.mp4");
-
-//Random livestream file:
-//        Uri mp4VideoUri =Uri.parse("http://23.237.4.162:8080/Skysports1/index.m3u8");
-
-//Sports livestream file:
-//        Uri mp4VideoUri =Uri.parse("http://23.237.4.162:8080/SkySportsHD3/index.m3u8");
-
-
-
-
-// Measures bandwidth during playback. Can be null if not required.
-        DefaultBandwidthMeter bandwidthMeterA = new DefaultBandwidthMeter();
-//Produces DataSource instances through which media data is loaded.
-//        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "exoplayer2example"), bandwidthMeterA);
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(getActivity(), Util.getUserAgent(getActivity(), "exoplayer2example"), bandwidthMeterA);
-
-//Produces Extractor instances for parsing the media data.
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
-//This is the MediaSource representing the media to be played:
-//FOR SD CARD SOURCE:
-//        MediaSource videoSource = new ExtractorMediaSource(mp4VideoUri, dataSourceFactory, extractorsFactory, null, null);
-
-//FOR LIVESTREAM LINK:
-        MediaSource videoSource = new HlsMediaSource(mp4VideoUri, dataSourceFactory, 1, null, null);
-        final LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
-
-
-// Prepare the player with the source.
-        player.prepare(loopingSource);
-
-
-        player.addListener(new ExoPlayer.EventListener() {
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-                Log.v(TAG,"Listener-onLoadingChanged...");
-
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                Log.v(TAG,"Listener-onPlayerStateChanged...");
-
-            }
-
-            @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-                Log.v(TAG,"Listener-onTimelineChanged...");
-
-            }
-
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-                Log.v(TAG,"Listener-onPlayerError...");
-                player.stop();
-                player.prepare(loopingSource);
-                player.setPlayWhenReady(true);
-            }
-
-            @Override
-            public void onPositionDiscontinuity() {
-                Log.v(TAG,"Listener-onPositionDiscontinuity...");
-
-            }
-
-        });
-        player.setPlayWhenReady(true);
 
         return view;
     }
 
+
     private void setupVideoView(View view) {
         // Make sure to use the correct VideoView import
-     /*   videoView = (VideoView)view.findViewById(R.id.video_view);
+        /*videoView = (VideoView)view.findViewById(R.id.video_view);
         videoView.setOnPreparedListener(getActivity());
 
         //For now we just picked an arbitrary item to play
@@ -173,12 +146,122 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_next:
+                setDataView(this.listStep.get(this.idSelected+1));
+                break;
+            case R.id.btn_previous:
+                setDataView(this.listStep.get(this.idSelected-1));
+                break;
+        }
+    }
+
+    protected void setDataView(StepRecipe step){
+        this.txtDescription.setText(step.getInstruction());
+        this.idSelected = step.getId();
+        this.reproduceVideo(step.getUrlPlayer());
+        this.checkButtons();
+        this.checkVideo(step.getUrlPlayer());
+    }
+
+    private void checkVideo(String url){
+        if(url.isEmpty())
+            this.surfaceView.setVisibility(View.GONE);
+        else
+            this.surfaceView.setVisibility(View.VISIBLE);
+    }
+
+/*    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        try {
+            System.out.println("surface created");
+            System.out.println("url video "+this.urlSelected);
+           // mediaPlayer =  MediaPlayer.create(getActivity(), Uri.parse("https://d17h27t6h515a5.cloudfront.net/topher/2017/April/58ffd974_-intro-creampie/-intro-creampie.mp4"));
+            mediaPlayer.setDisplay(holder);
+            mediaPlayer.setDataSource(this.urlSelected);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            System.out.println("error "+e.getCause());
+            //Log.e("MEDIA_PLAYER", e.getMessage());
+        } catch (IllegalStateException e) {
+            //Log.e("MEDIA_PLAYER", e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            //Log.e("MEDIA_PLAYER", e.getMessage());
+            e.printStackTrace();
+            e.getCause();
+        }
+    }*/
+
+    private void reproduceVideo(String urlVideo){
+        //mediaPlayer.setDisplay(holder);
+        try {
+            System.out.println("url a setear "+urlVideo);
+            if(mediaPlayer!=null){
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+            this.urlSelected = urlVideo;
+            /*mediaPlayer.reset();
+            SurfaceHolder holder = this.surfaceView.getHolder();
+            holder.addCallback(this);
+            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+            mediaPlayer.setDataSource(urlVideo);
+            mediaPlayer.prepare();
+            mediaPlayer.start();*/
+            surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+                @Override
+                public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                    Log.d(TAG, "First surface created!");
+                   // mFirstSurface = surfaceHolder;
+                    if (urlSelected != null) {
+                        mediaPlayer = new MediaPlayer();//.create(getActivity(),
+                               //Uri.parse(urlSelected), surfaceHolder);
+                       // mActiveSurface = mFirstSurface;
+                        try {
+                            mediaPlayer.setDataSource(urlSelected);
+                            mediaPlayer.setDisplay(surfaceHolder);
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+
+                }
+
+                @Override
+                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                    Log.d(TAG, "First surface destroyed!");
+                }
+            });
+        }  catch (IllegalStateException e) {
+            e.printStackTrace();
+//            Log.e("MEDIA_PLAYER", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+/*    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        player.release();
-    }
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mediaPlayer.release();
+    }*/
 }

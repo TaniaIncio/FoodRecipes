@@ -7,4 +7,10 @@
     <string name="add_widget">Add widget</string>
     <string name="preferences">preferences_app</string>
     <string name="preferences_recipeid">pref_recipe_id</string>
+
+    <!-- NAME BUTTONS -->
+    <string name="btn_previous">Previous</string>
+    <string name="btn_next">Next</string>
+
 </resources>
+

@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.database.DatabaseHelper;
 import com.tincio.foodrecipes.data.model.StepRecipe;
-import com.tincio.foodrecipes.data.service.response.StepResponse;
 import com.tincio.foodrecipes.presentation.viewModel.StepViewModel;
 
 /**
@@ -42,32 +41,19 @@ public class StepFragment extends LifecycleFragment {
     int idRecipe ;
     MyStepRecyclerViewAdapter adapter;
     private SharedPreferences preferences;
-    public StepFragment() {
-    }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static StepFragment newInstance(int columnCount, int idRecipe) {
-        StepFragment fragment = new StepFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(RECIPE_ID, idRecipe);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
     private int getIdRecipe(){
         return preferences.getInt(getString(R.string.preferences_recipeid), 0);
     }
 
+    public StepFragment(){}
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(StepViewModel.class);
         viewModel.init(UID_KEY);
         preferences = getActivity().getSharedPreferences(getString(R.string.preferences), Context.MODE_PRIVATE);
-     //   if(getArguments()!=null)
-            this.idRecipe = getIdRecipe();// getArguments().getInt(RECIPE_ID, 0) == 0? this.idRecipe :getArguments().getInt(RECIPE_ID);
+        this.idRecipe = getIdRecipe();
         DatabaseHelper helper = new DatabaseHelper(getActivity());
         viewModel.getSteps(helper,this.idRecipe).observe(this, steps -> {
             if (mColumnCount <= 1) {
@@ -80,10 +66,11 @@ public class StepFragment extends LifecycleFragment {
             adapter.setOnItemClickListener(new MyStepRecyclerViewAdapter.OnItemClickListener() {
                 @Override
                 public void setOnItemClickListener(StepRecipe step, Integer indice) {
+
                     if(getResources().getBoolean(R.bool.isTablet))
                         getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, new InstructionFragment()).commit();
                     else
-                        getFragmentManager().beginTransaction().replace(R.id.fragment_base, new InstructionFragment()).addToBackStack(TAG).commit();
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_base_step, InstructionFragment.newInstance(step.getInstruction(), step.getUrlPlayer(), step.getId(), adapter.getValues())).addToBackStack(InstructionFragment.TAG).commit();
                 }
             });
         });
@@ -105,56 +92,19 @@ public class StepFragment extends LifecycleFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_step);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
-
         linearIngredient = (LinearLayout)view.findViewById(R.id.option_ingredient);
         linearIngredient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("id enviada "+idRecipe);
                 if(getResources().getBoolean(R.bool.isTablet))
                     getFragmentManager().beginTransaction().replace(R.id.fragment_base_tablet, IngredientFragment.newInstance(1,idRecipe)).commit();
                 else
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_base, IngredientFragment.newInstance(1,idRecipe)).addToBackStack(TAG).commit();
+                {
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_base_step, IngredientFragment.newInstance(1,idRecipe)).addToBackStack(IngredientFragment.TAG).commit();
+                }
             }
         });
         return view;
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-       /* if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }*/
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-       // mListener = null;
-    }
-
- /*   @Override
-    public void onListFragmentInteraction(StepResponse item) {
-
-    }*/
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(StepResponse item);
-    }
 }
