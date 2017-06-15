@@ -128,19 +128,11 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                 ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
     //setear
         this.exoplayer.setPlayer(player);
-        // Measures bandwidth during playback. Can be null if not required.
-       // DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-// Produces DataSource instances through which media data is loaded.
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
                 Util.getUserAgent(getContext(), "FoodRecipes"));
-     //   DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
-       //         Util.getUserAgent(getContext(), "yourApplicationName"), bandwidthMeter);
-// Produces Extractor instances for parsing the media data.
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-// This is the MediaSource representing the media to be played.
         MediaSource videoSource = new ExtractorMediaSource(Uri.parse(this.urlSelected),
                 dataSourceFactory, extractorsFactory, null, null);
-// Prepare the player with the source.
         player.prepare(videoSource);
         player.setPlayWhenReady(true);
     }
@@ -164,15 +156,9 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
 
     private void releasePlayer() {
         if (player != null) {
-            //debugViewHelper.stop();
-            //debugViewHelper = null;
-            //shouldAutoPlay = player.getPlayWhenReady();
-            //updateResumePosition();
             player.release();
             player = null;
             trackSelector = null;
-           // trackSelectionHelper = null;
-          //  eventLogger = null;
         }
     }
 
@@ -253,20 +239,14 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
 
     private void checkStateVideo(){
         releasePlayer();
-      /*  if(mediaPlayer!=null){
-            if(mediaPlayer.isPlaying())
-                mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }*/
     }
     protected void setDataView(StepRecipe step){
         this.txtDescription.setText(step.getInstruction());
         this.idSelected = step.getId();
         this.urlSelected = step.getUrlPlayer();
         this.urlImage = step.getImage();
-        this.checkVideo(step.getUrlPlayer());
         this.checkImageOrVideo();
+        this.checkVideo(step.getUrlPlayer());
         //this.reproduceVideo();
         this.checkButtons();
 

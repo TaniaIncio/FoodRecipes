@@ -20,12 +20,7 @@ import static com.tincio.foodrecipes.data.provider.RecipeContract.PATH_RECIPES;
  */
 public class RecipeWIdgetService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     public static final String ACTION_RECIPE = "com.tincio.foodrecipes.presentation.widget.action.RECPE";
-
-    // TODO: Rename parameters
-    /*private static final String EXTRA_PARAM1 = "com.tincio.foodrecipes.presentation.widget.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.tincio.foodrecipes.presentation.widget.extra.PARAM2";*/
 
     public RecipeWIdgetService() {
         super("RecipeWIdgetService");
@@ -50,8 +45,6 @@ public class RecipeWIdgetService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_RECIPE.equals(action)) {
-                /*final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);*/
                 handleActionRecipe();
             }
         }
@@ -63,18 +56,14 @@ public class RecipeWIdgetService extends IntentService {
      */
     private void handleActionRecipe() {
         // TODO: Handle action Foo
-        /*throw new UnsupportedOperationException("Not yet implemented");*/
         Uri RECIPE_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         ContentValues contentValues = new ContentValues();
-        long timeNow = System.currentTimeMillis();
-    //    contentValues.put(RecipeContract.RecipeEntry.COLUMN_LAST_WATERED_TIME, timeNow);
-        // Update only plants that are still alive
         try{
             getContentResolver().update(
                     RECIPE_URI,
                     contentValues,
-                    null,//RecipeContract.PlantEntry.COLUMN_LAST_WATERED_TIME+">?"
-                    null);// new String[]{String.valueOf(timeNow - PlantUtils.MAX_AGE_WITHOUT_WATER)}
+                    null,
+                    null);
         }catch (Exception e){
             System.out.println("esception "+e.getMessage());
         }
@@ -85,8 +74,4 @@ public class RecipeWIdgetService extends IntentService {
      * Handle action Baz in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }

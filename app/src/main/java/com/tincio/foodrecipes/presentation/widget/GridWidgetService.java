@@ -40,7 +40,6 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
-        // Get all plant info ordered by creation time
         Uri PLANT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_RECIPES).build();
         if (mCursor != null) mCursor.close();
         mCursor = mContext.getContentResolver().query(
