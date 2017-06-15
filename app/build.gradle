@@ -51,4 +51,7 @@ dependencies {
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.+'
+    compile 'com.google.android.exoplayer:exoplayer-dash:r2.+'
+    compile 'com.google.android.exoplayer:exoplayer-ui:r2.+'
 }

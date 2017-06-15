@@ -15,16 +15,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <SurfaceView
-                android:id="@+id/player_view"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/height_surface_video" />
+                android:layout_height="wrap_content"
+                android:id="@+id/linear_media"
+                android:orientation="vertical">
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            android:layout_width="match_parent"
+            android:id="@+id/exoplayer_video"
+            android:layout_height="@dimen/height_surface_video">
 
+        </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_surface_video"
+                android:id="@+id/img_step"
+                />
+            </LinearLayout>
             <TextView
                 android:id="@+id/txt_description_instruction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/player_view"
+                android:layout_below="@+id/linear_media"
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_gridlayout_marginrow" />
 

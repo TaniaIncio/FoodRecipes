@@ -5,19 +5,37 @@ import android.app.Fragment;
 import android.arch.lifecycle.LifecycleFragment;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 import com.tincio.foodrecipes.R;
 import com.tincio.foodrecipes.data.model.StepRecipe;
 
@@ -36,33 +54,53 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
     private TextView txtDescription;
     private Button btnPrevious;
     private Button btnNext;
-    SurfaceView surfaceView;
     LinearLayout linearButtons;
+    ImageView imgStep;
+    SimpleExoPlayerView exoplayer;
+    SimpleExoPlayer player;
+    TrackSelector trackSelector;
     /***CONSTANTS**/
     protected static String ID = "ID";
     protected static String URL = "URL";
     protected static String DESCRIPTION = "DESCRIPTION";
     protected static String LIST_STEP = "LIST_STEP";
+    protected static String URL_IMAGE = "URL_IMAGE";
     //player
     /**VARIABLES***/
     List<StepRecipe> listStep;
     int idSelected;
-    private MediaPlayer mediaPlayer;
     String urlSelected;
+    String urlImage;
 
     public InstructionFragment() {
         // Required empty public constructor
     }
 
-    public static InstructionFragment newInstance(String description, String url, int id, List<StepRecipe> listStep){
+    public static InstructionFragment newInstance(String description, String url, int id, String urlImage,List<StepRecipe> listStep){
         InstructionFragment fragment = new InstructionFragment();
         Bundle bundle = new Bundle();
         bundle.putString(DESCRIPTION, description);
         bundle.putString(URL, url);
+        bundle.putString(URL_IMAGE, urlImage);
         bundle.putInt(ID, id);
         bundle.putParcelableArrayList(LIST_STEP,(ArrayList)listStep);
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view =inflater.inflate(R.layout.fragment_instruction, container, false);
+        txtDescription = (TextView)view.findViewById(R.id.txt_description_instruction);
+        btnPrevious = (Button)view.findViewById(R.id.btn_previous);
+        btnNext = (Button)view.findViewById(R.id.btn_next);
+        this.imgStep = (ImageView)view.findViewById(R.id.img_step);
+        this.linearButtons = (LinearLayout)view.findViewById(R.id.linear_buttons);
+        this.exoplayer = (SimpleExoPlayerView)view.findViewById(R.id.exoplayer_video);
+        this.checkStateVideo();
+        return view;
     }
 
     void setData(){
@@ -70,8 +108,76 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
         this.listStep = getArguments().getParcelableArrayList(LIST_STEP);
         this.idSelected = getArguments().getInt(ID);
         this.urlSelected = getArguments().getString(URL);
+        this.urlImage = getArguments().getString(URL_IMAGE);
         this.checkButtons();
-        this.reproduceVideo();
+        this.checkImageOrVideo();
+
+    }
+
+    void initVideoStreaming(){
+        // 1. Create a default TrackSelector
+        Handler mainHandler = new Handler();
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+// 2. Create the player
+         player =
+                ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+    //setear
+        this.exoplayer.setPlayer(player);
+        // Measures bandwidth during playback. Can be null if not required.
+       // DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+// Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
+                Util.getUserAgent(getContext(), "FoodRecipes"));
+     //   DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
+       //         Util.getUserAgent(getContext(), "yourApplicationName"), bandwidthMeter);
+// Produces Extractor instances for parsing the media data.
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+// This is the MediaSource representing the media to be played.
+        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(this.urlSelected),
+                dataSourceFactory, extractorsFactory, null, null);
+// Prepare the player with the source.
+        player.prepare(videoSource);
+        player.setPlayWhenReady(true);
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            //debugViewHelper.stop();
+            //debugViewHelper = null;
+            //shouldAutoPlay = player.getPlayWhenReady();
+            //updateResumePosition();
+            player.release();
+            player = null;
+            trackSelector = null;
+           // trackSelectionHelper = null;
+          //  eventLogger = null;
+        }
+    }
+
+    void setImage(String url){
+        Picasso.with(getActivity()).load(url).into(this.imgStep);
     }
 
     void checkButtons(){
@@ -82,6 +188,19 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                 this.btnNext.setVisibility(View.INVISIBLE);
         }else
             this.btnPrevious.setVisibility(View.INVISIBLE);
+    }
+
+    private void checkImageOrVideo(){
+        if(this.urlSelected.isEmpty()){
+            this.imgStep.setVisibility(View.VISIBLE);
+            this.exoplayer.setVisibility(View.GONE);
+            if (this.urlImage.isEmpty() == false)
+                this.setImage(this.urlImage);
+        }else{
+            this.imgStep.setVisibility(View.GONE);
+            this.exoplayer.setVisibility(View.VISIBLE);
+            this.reproduceVideo();
+        }
     }
 
     @Override
@@ -98,63 +217,25 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
             this.linearButtons.setVisibility(View.GONE);
         }else {
             this.linearButtons.setVisibility(View.VISIBLE);
-            this.checkOrientation();
+        //    this.checkOrientation();
         }
-        this.initMediaPlayer();
+       // this.initVideoStreaming();
     }
 
-    private void initMediaPlayer(){
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                if (urlSelected != null && urlSelected.isEmpty() == false) {
-                    mediaPlayer = new MediaPlayer();
-                    try {
 
-                        mediaPlayer.setDisplay(surfaceHolder);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                Log.d(TAG, "First surface destroyed!");
-            }
-        });
-    }
 
     private void checkOrientation(){
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
         {
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, (int)getResources().getDimension(R.dimen.height_surface_video));
-            this.surfaceView.setLayoutParams(lp);
+            this.exoplayer.setLayoutParams(lp);
         } else {
             // Landscape Mode
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-            this.surfaceView.setLayoutParams(lp);
+            this.exoplayer.setLayoutParams(lp);
         }
     }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =inflater.inflate(R.layout.fragment_instruction, container, false);
-        txtDescription = (TextView)view.findViewById(R.id.txt_description_instruction);
-        btnPrevious = (Button)view.findViewById(R.id.btn_previous);
-        btnNext = (Button)view.findViewById(R.id.btn_next);
-        this.surfaceView = (SurfaceView)view.findViewById(R.id.player_view);
-        this.linearButtons = (LinearLayout)view.findViewById(R.id.linear_buttons);
-        return view;
-    }
+
 
     @Override
     public void onClick(View v) {
@@ -171,32 +252,36 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
     }
 
     private void checkStateVideo(){
-        if(mediaPlayer!=null){
+        releasePlayer();
+      /*  if(mediaPlayer!=null){
             if(mediaPlayer.isPlaying())
                 mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
-        }
+        }*/
     }
     protected void setDataView(StepRecipe step){
         this.txtDescription.setText(step.getInstruction());
         this.idSelected = step.getId();
         this.urlSelected = step.getUrlPlayer();
+        this.urlImage = step.getImage();
         this.checkVideo(step.getUrlPlayer());
-        this.reproduceVideo();
+        this.checkImageOrVideo();
+        //this.reproduceVideo();
         this.checkButtons();
 
     }
 
     private void checkVideo(String url){
         if(url.isEmpty())
-            this.surfaceView.setVisibility(View.GONE);
+            this.exoplayer.setVisibility(View.GONE);
         else
-            this.surfaceView.setVisibility(View.VISIBLE);
+            this.exoplayer.setVisibility(View.VISIBLE);
     }
 
     private void reproduceVideo() {
-        if (urlSelected != null && urlSelected.isEmpty() == false) {
+        this.initVideoStreaming();
+       /* if (urlSelected != null && urlSelected.isEmpty() == false) {
             mediaPlayer = new MediaPlayer();
             try {
                 mediaPlayer.setDataSource(urlSelected);
@@ -216,6 +301,6 @@ public class InstructionFragment extends LifecycleFragment implements View.OnCli
                 e.printStackTrace();
             }
 
-        }
+        }*/
     }
 }
