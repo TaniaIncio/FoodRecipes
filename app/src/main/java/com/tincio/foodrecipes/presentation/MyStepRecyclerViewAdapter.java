@@ -30,7 +30,7 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_step, parent, false);
+                .inflate(R.layout.row_fragment_step, parent, false);
         return new ViewHolder(view);
     }
 

@@ -30,5 +30,5 @@ ext{
     retrofitVersion = '2.3.0'
     guavaVersion = '20.0'
     picassoVersion = '2.5.2'
-    daggerVersion = '2.2'
+    daggerVersion = '2.5'
 }

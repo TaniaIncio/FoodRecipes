@@ -18,6 +18,6 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"
         app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/fragment_step" />
+        tools:listitem="@layout/row_fragment_step" />
     </LinearLayout>
 </FrameLayout>
